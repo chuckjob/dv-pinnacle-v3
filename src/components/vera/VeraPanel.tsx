@@ -336,7 +336,7 @@ const campaignSetupInitialMessages: Message[] = [
   },
 ];
 
-const campaignKpis = [
+const defaultKpiValues = [
   { name: "Target Block Rate", value: "< 7%", benchmark: "6.2%", status: "aligned" as const },
   { name: "Target CPM", value: "< $7.00", benchmark: "$6.80", status: "aligned" as const },
   { name: "Target Viewability", value: "> 70%", benchmark: "72%", status: "aligned" as const },
@@ -349,6 +349,9 @@ interface InconsistencyItem {
   description: string;
   severity: "high" | "medium" | "low";
   recommendation: string;
+  source?: string;
+  affectedCategories?: string[];
+  currentSetting?: string;
   topic?: string;
   industryBenchmark?: string;
   reachImpact?: string;
@@ -358,16 +361,22 @@ const profileInconsistencies: InconsistencyItem[] = [
   {
     id: 0,
     type: "mismatch",
+    source: "Category Filter vs. Topic Filter",
     description: "Current profile blocks 'Iran — Water Crisis' but allows 'Environmental News'",
     severity: "medium",
     recommendation: "Align categories to block 'Iran — Water Crisis' for consistency",
+    affectedCategories: ["News & Politics", "Environment"],
+    currentSetting: "Blocked: Iran — Water Crisis | Allowed: Environmental News",
   },
   {
     id: 1,
     type: "mismatch",
+    source: "Keyword Blocklist",
     description: "Current profile blocks 'election' keyword broadly — may over-block benign election coverage",
     severity: "low",
     recommendation: "Narrow 'election' blocking to exclude educational content",
+    affectedCategories: ["News & Politics", "Education"],
+    currentSetting: "Keyword: 'election' → Full block",
   },
 ];
 
@@ -1035,6 +1044,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
   const [biApproved, setBiApproved] = useState(false);
   const [biExpanded, setBiExpanded] = useState(false);
   // Step 4: KPIs
+  const [kpiValues, setKpiValues] = useState(defaultKpiValues);
   const [kpisApproved, setKpisApproved] = useState(false);
   const [kpiExpanded, setKpiExpanded] = useState(false);
   // Step 5: Inconsistencies
@@ -1083,6 +1093,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
       setBriefExpanded(false);
       setBiApproved(false);
       setBiExpanded(false);
+      setKpiValues(defaultKpiValues);
       setKpisApproved(false);
       setKpiExpanded(false);
       setInconsistenciesResolved(false);
@@ -1934,7 +1945,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                   <p className="text-caption text-cool-500 mt-1">Industry: CPG — Beverages Sector</p>
                 </div>
                 <div className="divide-y divide-neutral-100">
-                  {campaignKpis.map((kpi) => (
+                  {kpiValues.map((kpi, kpiIdx) => (
                     <div key={kpi.name} className="px-5 py-3 flex items-center justify-between">
                       <div>
                         <p className="text-body3 font-medium text-cool-800">{kpi.name}</p>
@@ -1968,14 +1979,21 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 <p className="text-caption text-cool-500 mt-1">Industry: CPG — Beverages Sector</p>
               </div>
               <div className="divide-y divide-neutral-100">
-                {campaignKpis.map((kpi) => (
+                {kpiValues.map((kpi, kpiIdx) => (
                   <div key={kpi.name} className="px-5 py-3 flex items-center justify-between">
                     <div>
                       <p className="text-body3 font-medium text-cool-800">{kpi.name}</p>
                       <p className="text-caption text-cool-500">Benchmark: {kpi.benchmark}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-body3 font-semibold text-cool-900">{kpi.value}</span>
+                      <input
+                        type="text"
+                        value={kpi.value}
+                        onChange={(e) => {
+                          setKpiValues(prev => prev.map((k, i) => i === kpiIdx ? { ...k, value: e.target.value } : k));
+                        }}
+                        className="w-20 text-right text-body3 font-semibold text-cool-900 bg-transparent border-b border-neutral-200 hover:border-neutral-300 focus:border-plum-400 outline-none px-1 py-0.5"
+                      />
                       <span className={cn(
                         "px-2 py-0.5 rounded-full text-label font-medium",
                         kpi.status === "aligned" ? "bg-grass-50 text-grass-700" : "bg-orange-50 text-orange-700"
@@ -2033,15 +2051,28 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               </div>
               {profileInconsistencies.map((issue) => (
                 <div key={issue.id} className={cn("rounded-lg border bg-white p-3", acceptedInconsistencies.has(issue.id) ? "border-grass-200" : "border-neutral-200")}>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <span className={cn(
                       "px-1.5 py-0.5 rounded text-label font-medium",
                       acceptedInconsistencies.has(issue.id) ? "bg-grass-50 text-grass-700" : issue.severity === "medium" ? "bg-orange-50 text-orange-700" : "bg-neutral-50 text-cool-600"
                     )}>
                       {acceptedInconsistencies.has(issue.id) ? "Accepted" : issue.severity === "medium" ? "Medium" : "Low"}
                     </span>
+                    {issue.source && (
+                      <span className="text-label text-cool-400">Source: {issue.source}</span>
+                    )}
                   </div>
-                  <p className="text-body3 text-cool-700 mb-1.5">{issue.description}</p>
+                  <p className="text-body3 text-cool-700 mb-1">{issue.description}</p>
+                  {issue.currentSetting && (
+                    <p className="text-caption text-cool-500 mb-1">Currently: {issue.currentSetting}</p>
+                  )}
+                  {issue.affectedCategories && issue.affectedCategories.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-1.5">
+                      {issue.affectedCategories.map(cat => (
+                        <span key={cat} className="px-1.5 py-0.5 rounded bg-neutral-100 text-label text-cool-500">{cat}</span>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-caption text-plum-600 italic">Recommendation: {issue.recommendation}</p>
                   {!acceptedInconsistencies.has(issue.id) ? (
                     <button
@@ -2293,6 +2324,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
         {/* Phase 8: DSP Connect (reuse existing pattern) */}
         {isCampaignSetup && setupPhase === "dsp-connect" && (
           <div className={cn("space-y-3 self-start", cardWidth)}>
+            {/* DSP Header */}
+            <div className="px-5 py-4 rounded-xl bg-gradient-to-r from-plum-25 to-white border border-neutral-200">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-plum-600" />
+                <span className="text-body3 font-semibold text-cool-900">Connect Your DSP</span>
+              </div>
+              <p className="text-caption text-cool-500 mt-1">Link your demand-side platform to activate brand safety controls on your campaigns.</p>
+            </div>
             {/* Connected DSPs */}
             {connectedDsps.map((dsp) => (
               <div key={`${dsp.platform}-${dsp.seatId}`} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-grass-100 bg-grass-25">
@@ -2413,10 +2452,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               </div>
               <div>
                 <p className="text-body3 font-medium text-grass-700">
-                  {syncedDspNames.length > 0 ? "Campaign Setup Complete! Profile synced." : "Campaign Setup Complete! Profile created."}
+                  {syncedDspNames.length > 0
+                    ? `Campaign Setup Complete! Profile synced to ${connectedDsps.length} DSP${connectedDsps.length !== 1 ? "s" : ""}.`
+                    : "Campaign Setup Complete! Profile created."}
                 </p>
                 <p className="text-body3 text-cool-600 mt-0.5">
-                  Brand safety profile is active for {profileName}
+                  {syncedDspNames.length > 0
+                    ? `${profileName} is active on ${connectedDsps.map(d => d.platformLabel).join(", ")}`
+                    : `Brand safety profile is active for ${profileName}`}
                 </p>
               </div>
             </div>
