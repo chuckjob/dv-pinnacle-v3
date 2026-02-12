@@ -2148,9 +2148,9 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 setUnblockResolved(true);
                 const unblocked = [...unblockDecisions.values()].filter(v => v === "unblock").length;
                 const msg: Message = { id: `resolve-unblock-${Date.now()}`, role: "user", content: `${unblocked} topics unblocked. Continue.` };
-                const veraMsg: Message = { id: `vera-naming-${Date.now()}`, role: "vera", content: "Now let's give your profile a name." };
+                const veraMsg: Message = { id: `vera-dsp-${Date.now()}`, role: "vera", content: "Great choices! Now let's connect your DSP so the profile can start optimizing campaign performance." };
                 setMessages(prev => [...prev, msg, veraMsg]);
-                setSetupPhase("profile-naming");
+                setSetupPhase("dsp-connect");
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
             >
@@ -2261,24 +2261,27 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-body3 text-cool-600">DSP</span>
-                  <span className="text-body3 font-medium text-cool-900">The Trade Desk</span>
+                  <span className="text-body3 font-medium text-cool-900">
+                    {connectedDsps.length > 0
+                      ? connectedDsps.map(d => d.platformLabel).join(", ")
+                      : "Not connected"}
+                  </span>
                 </div>
               </div>
             </div>
             <button
               onClick={() => {
-                const msg: Message = { id: `approve-review-${Date.now()}`, role: "user", content: "Approved. Let's connect the DSP." };
-                const veraMsg: Message = { id: `vera-dsp-${Date.now()}`, role: "vera", content: "Profile approved! Let's connect your DSP so the profile can start optimizing campaign performance." };
-                setMessages(prev => [...prev, msg, veraMsg]);
-                setSetupPhase("dsp-connect");
+                const msg: Message = { id: `approve-review-${Date.now()}`, role: "user", content: "Profile approved!" };
+                setMessages(prev => [...prev, msg]);
+                setProfileCreated(true);
+                setSetupPhase("final-touches");
+                const veraMsg: Message = { id: `vera-final-${Date.now()}`, role: "vera", content: "Your profile is live! Would you like to add any final customizations before we wrap up?" };
+                setMessages(prev => [...prev, veraMsg]);
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
             >
               <Check className="h-4 w-4" />
-              Approve & Connect DSP
-            </button>
-            <button className="w-full text-body3 text-cool-500 hover:text-cool-700 underline underline-offset-2 py-1">
-              Switch to manual configuration
+              Approve & Create Profile
             </button>
           </div>
         )}
@@ -2353,9 +2356,8 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                   setSyncedDspNames(connectedDsps.map(d => `${d.platformLabel}: ${d.seatId}`));
                   setSetupPhase("syncing");
                   setTimeout(() => {
-                    setSetupPhase("final-touches");
-                    setProfileCreated(true);
-                    const veraMsg: Message = { id: `vera-final-${Date.now()}`, role: "vera", content: "Your profile is live! Would you like to add any final customizations before we wrap up?" };
+                    setSetupPhase("profile-naming");
+                    const veraMsg: Message = { id: `vera-naming-${Date.now()}`, role: "vera", content: "DSP connected! Now let's give your profile a name." };
                     setMessages(prev => [...prev, veraMsg]);
                   }, 2500);
                 }}
@@ -2368,9 +2370,8 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
             <button
               onClick={() => {
                 setSyncedDspNames([]);
-                setSetupPhase("final-touches");
-                setProfileCreated(true);
-                const veraMsg: Message = { id: `vera-final-${Date.now()}`, role: "vera", content: "Your profile is live! Would you like to add any final customizations before we wrap up?" };
+                setSetupPhase("profile-naming");
+                const veraMsg: Message = { id: `vera-naming-${Date.now()}`, role: "vera", content: "No problem, you can connect a DSP later. Now let's give your profile a name." };
                 setMessages(prev => [...prev, veraMsg]);
               }}
               className="text-body3 text-cool-500 hover:text-cool-700 underline underline-offset-2 py-1 w-full text-center"
