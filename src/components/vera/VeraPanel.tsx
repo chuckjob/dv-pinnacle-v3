@@ -2324,14 +2324,6 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
         {/* Phase 8: DSP Connect (reuse existing pattern) */}
         {isCampaignSetup && setupPhase === "dsp-connect" && (
           <div className={cn("space-y-3 self-start", cardWidth)}>
-            {/* DSP Header */}
-            <div className="px-5 py-4 rounded-xl bg-gradient-to-r from-plum-25 to-white border border-neutral-200">
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-plum-600" />
-                <span className="text-body3 font-semibold text-cool-900">Connect Your DSP</span>
-              </div>
-              <p className="text-caption text-cool-500 mt-1">Link your demand-side platform to activate brand safety controls on your campaigns.</p>
-            </div>
             {/* Connected DSPs */}
             {connectedDsps.map((dsp) => (
               <div key={`${dsp.platform}-${dsp.seatId}`} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-grass-100 bg-grass-25">
@@ -2346,43 +2338,52 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               </div>
             ))}
 
-            {/* DSP Form */}
+            {/* DSP Form with integrated header */}
             {(showDspForm || connectedDsps.length === 0) && (
-              <div className="rounded-xl border border-neutral-200 bg-white p-4 space-y-3">
-                <div>
-                  <label className="text-body3 font-medium text-cool-700 mb-1.5 block">Platform</label>
-                  <div className="relative">
-                    <select
-                      value={dspFormPlatform}
-                      onChange={(e) => setDspFormPlatform(e.target.value)}
-                      className="w-full h-10 px-3 pr-8 text-body3 bg-white border border-neutral-200 rounded-lg outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100 appearance-none cursor-pointer"
-                    >
-                      <option value="">Select platform...</option>
-                      {dspPlatforms.map((p) => (
-                        <option key={p.value} value={p.value}>{p.label}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-400 pointer-events-none" />
+              <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
+                <div className="px-5 py-4 bg-gradient-to-r from-plum-25 to-white border-b border-neutral-100">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-5 w-5 text-plum-600" />
+                    <span className="text-body2 font-semibold text-cool-900">Connect Your DSP</span>
                   </div>
+                  <p className="text-body3 text-cool-500 mt-1">Link your demand-side platform to activate brand safety controls on your campaigns.</p>
                 </div>
-                <div>
-                  <label className="text-body3 font-medium text-cool-700 mb-1.5 block">Seat ID</label>
-                  <input
-                    type="text"
-                    value={dspFormSeatId}
-                    onChange={(e) => setDspFormSeatId(e.target.value)}
-                    placeholder="Enter seat ID..."
-                    className="w-full h-10 px-3 text-body3 bg-white border border-neutral-200 rounded-lg outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100"
-                  />
+                <div className="p-4 space-y-3">
+                  <div>
+                    <label className="text-body3 font-medium text-cool-700 mb-1.5 block">Platform</label>
+                    <div className="relative">
+                      <select
+                        value={dspFormPlatform}
+                        onChange={(e) => setDspFormPlatform(e.target.value)}
+                        className="w-full h-10 px-3 pr-8 text-body3 bg-white border border-neutral-200 rounded-lg outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100 appearance-none cursor-pointer"
+                      >
+                        <option value="">Select platform...</option>
+                        {dspPlatforms.map((p) => (
+                          <option key={p.value} value={p.value}>{p.label}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-400 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-body3 font-medium text-cool-700 mb-1.5 block">Seat ID</label>
+                    <input
+                      type="text"
+                      value={dspFormSeatId}
+                      onChange={(e) => setDspFormSeatId(e.target.value)}
+                      placeholder="Enter seat ID..."
+                      className="w-full h-10 px-3 text-body3 bg-white border border-neutral-200 rounded-lg outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100"
+                    />
+                  </div>
+                  <button
+                    onClick={handleConnectDsp}
+                    disabled={!dspFormPlatform || !dspFormSeatId.trim()}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-plum-200 bg-plum-50 text-plum-700 text-body3 font-medium hover:bg-plum-100 transition-colors disabled:bg-neutral-50 disabled:text-neutral-400 disabled:border-neutral-200"
+                  >
+                    <Globe className="h-4 w-4" />
+                    Connect
+                  </button>
                 </div>
-                <button
-                  onClick={handleConnectDsp}
-                  disabled={!dspFormPlatform || !dspFormSeatId.trim()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-plum-200 bg-plum-50 text-plum-700 text-body3 font-medium hover:bg-plum-100 transition-colors disabled:bg-neutral-50 disabled:text-neutral-400 disabled:border-neutral-200"
-                >
-                  <Globe className="h-4 w-4" />
-                  Connect
-                </button>
               </div>
             )}
 
