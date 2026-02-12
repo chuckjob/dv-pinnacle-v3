@@ -361,22 +361,16 @@ const profileInconsistencies: InconsistencyItem[] = [
   {
     id: 0,
     type: "mismatch",
-    source: "Category Filter vs. Topic Filter",
-    description: "Current profile blocks 'Iran — Water Crisis' but allows 'Environmental News'",
+    description: "'Iran — Water Crisis' is blocked under News & Politics, but 'Environmental News' is allowed — these topics frequently overlap and may cause inconsistent filtering.",
     severity: "medium",
-    recommendation: "Align categories to block 'Iran — Water Crisis' for consistency",
-    affectedCategories: ["News & Politics", "Environment"],
-    currentSetting: "Blocked: Iran — Water Crisis | Allowed: Environmental News",
+    recommendation: "Block 'Iran — Water Crisis' under the Environment category as well to ensure consistent coverage.",
   },
   {
     id: 1,
     type: "mismatch",
-    source: "Keyword Blocklist",
-    description: "Current profile blocks 'election' keyword broadly — may over-block benign election coverage",
+    description: "The keyword 'election' is set to full-block, which may over-filter educational and non-partisan election coverage.",
     severity: "low",
-    recommendation: "Narrow 'election' blocking to exclude educational content",
-    affectedCategories: ["News & Politics", "Education"],
-    currentSetting: "Keyword: 'election' → Full block",
+    recommendation: "Narrow the 'election' keyword block to exclude educational content so informational articles aren't suppressed.",
   },
 ];
 
@@ -2055,29 +2049,19 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               <p className="text-body3 text-cool-600">We found conflicting settings in your profile that may affect brand safety coverage.</p>
               {profileInconsistencies.map((issue) => (
                 <div key={issue.id} className={cn("rounded-lg border bg-white p-3", acceptedInconsistencies.has(issue.id) ? "border-grass-200" : "border-neutral-200")}>
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="mb-2">
                     <span className={cn(
                       "px-1.5 py-0.5 rounded text-label font-medium",
                       acceptedInconsistencies.has(issue.id) ? "bg-grass-50 text-grass-700" : issue.severity === "medium" ? "bg-orange-50 text-orange-700" : "bg-neutral-50 text-cool-600"
                     )}>
                       {acceptedInconsistencies.has(issue.id) ? "Accepted" : issue.severity === "medium" ? "Medium" : "Low"}
                     </span>
-                    {issue.source && (
-                      <span className="text-label text-cool-400">Source: {issue.source}</span>
-                    )}
                   </div>
-                  <p className="text-body3 text-cool-700 mb-1">{issue.description}</p>
-                  {issue.currentSetting && (
-                    <p className="text-caption text-cool-500 mb-1">Currently: {issue.currentSetting}</p>
-                  )}
-                  {issue.affectedCategories && issue.affectedCategories.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-1.5">
-                      {issue.affectedCategories.map(cat => (
-                        <span key={cat} className="px-1.5 py-0.5 rounded bg-neutral-100 text-label text-cool-500">{cat}</span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-caption text-plum-600 italic">Recommendation: {issue.recommendation}</p>
+                  <p className="text-body3 text-cool-700 mb-2">{issue.description}</p>
+                  <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-plum-25 border border-plum-100">
+                    <Sparkles className="h-3.5 w-3.5 text-plum-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-body3 text-plum-700">{issue.recommendation}</p>
+                  </div>
                   {!acceptedInconsistencies.has(issue.id) ? (
                     <button
                       onClick={() => setAcceptedInconsistencies(prev => new Set([...prev, issue.id]))}
