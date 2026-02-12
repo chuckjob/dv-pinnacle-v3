@@ -1753,13 +1753,15 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
         {/* Step 2: Brief Input — full view */}
         {isCampaignSetup && setupPhase === "brief-input" && (
           <div className={cn("space-y-3 self-start", cardWidth)}>
-            {/* Tab toggle */}
-            <div className="flex gap-2">
+            {/* Segmented tab toggle */}
+            <div className="flex gap-1 p-1 rounded-lg bg-neutral-100">
               <button
                 onClick={() => setBriefInputMethod("upload")}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-body3 font-medium transition-colors",
-                  briefInputMethod === "upload" ? "bg-plum-600 text-white" : "bg-white border border-neutral-200 text-cool-600 hover:bg-neutral-50"
+                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-body3 font-medium transition-all",
+                  briefInputMethod === "upload"
+                    ? "bg-white text-cool-900 shadow-sm"
+                    : "text-cool-500 hover:text-cool-700"
                 )}
               >
                 <Upload className="h-3.5 w-3.5" />
@@ -1768,8 +1770,10 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               <button
                 onClick={() => setBriefInputMethod("crawl")}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-body3 font-medium transition-colors",
-                  briefInputMethod === "crawl" ? "bg-plum-600 text-white" : "bg-white border border-neutral-200 text-cool-600 hover:bg-neutral-50"
+                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-body3 font-medium transition-all",
+                  briefInputMethod === "crawl"
+                    ? "bg-white text-cool-900 shadow-sm"
+                    : "text-cool-500 hover:text-cool-700"
                 )}
               >
                 <Globe className="h-3.5 w-3.5" />
