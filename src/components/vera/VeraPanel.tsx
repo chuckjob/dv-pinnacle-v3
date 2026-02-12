@@ -1681,8 +1681,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                   setExistingProfileConfirmed(true);
                   setProfileName(`${pName} — Copy`);
                   const msg: Message = { id: `mode-${Date.now()}`, role: "user", content: `Start from "${pName}".` };
-                  const veraMsg: Message = { id: `vera-brief-existing-${Date.now()}`, role: "vera", content: `I'll use "${pName}" as your starting point. Now upload a brief or I can crawl your website.` };
-                  setMessages(prev => [...prev, msg, veraMsg]);
+                  setMessages(prev => [...prev, msg]);
                   setSetupPhase("brief-input");
                 } else {
                   setCreationModeConfirmed(true);
@@ -1700,19 +1699,29 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
           </div>
         )}
 
-        {/* Step 1b: Existing Profile — compact approved state (shown after creation-mode when existing was chosen) */}
+        {/* Step 1b: Existing Profile — Vera bubble with embedded confirmation (shown after creation-mode when existing was chosen) */}
         {isCampaignSetup && existingProfileConfirmed && setupPhase !== "creation-mode" && (
-          <div className={cn("self-start space-y-2", cardWidth)}>
-            <button
-              onClick={() => setExistingProfileExpanded(prev => !prev)}
-              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-grass-50 border border-grass-200 hover:bg-grass-100 transition-colors"
-            >
-              <div className="w-5 h-5 rounded-full bg-grass-500 flex items-center justify-center flex-shrink-0">
-                <Check className="h-3 w-3 text-white" />
+          <div className={cn("self-start", expanded ? "max-w-[70%]" : "max-w-[92%]")}>
+            <div className="rounded-2xl rounded-bl-sm bg-neutral-50 text-cool-800 border border-neutral-100 px-4 py-3 text-body3 space-y-2.5">
+              <p>I'll use "{brandSafetyProfiles.find(p => p.id === selectedExistingProfileId)?.name}" as your starting point. Now upload a brief or I can crawl your website.</p>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-grass-500 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-body3 font-medium text-grass-700 flex-1">Based on: {brandSafetyProfiles.find(p => p.id === selectedExistingProfileId)?.name ?? "Selected profile"}</span>
+                <button
+                  onClick={() => {
+                    setCreationModeConfirmed(false);
+                    setExistingProfileConfirmed(false);
+                    setSetupPhase("creation-mode");
+                    setMessages(prev => prev.filter(m => !m.id.startsWith("mode-")));
+                  }}
+                  className="text-label font-medium text-plum-600 hover:text-plum-700 transition-colors"
+                >
+                  Edit
+                </button>
               </div>
-              <span className="text-body3 font-medium text-grass-700 flex-1 text-left">Based on: {brandSafetyProfiles.find(p => p.id === selectedExistingProfileId)?.name ?? "Selected profile"}</span>
-              {existingProfileExpanded ? <ChevronDown className="h-3.5 w-3.5 text-grass-500" /> : <ChevronRight className="h-3.5 w-3.5 text-grass-500" />}
-            </button>
+            </div>
           </div>
         )}
 
