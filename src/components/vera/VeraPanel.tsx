@@ -1004,7 +1004,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // DSP form state
-  const [connectedDsps, setConnectedDsps] = useState<ConnectedDsp[]>([{ platform: "ttd", platformLabel: "The Trade Desk", seatId: "HBZERO-001" }]);
+  const [connectedDsps, setConnectedDsps] = useState<ConnectedDsp[]>([]);
   const [dspFormPlatform, setDspFormPlatform] = useState("");
   const [dspFormSeatId, setDspFormSeatId] = useState("");
   const [showDspForm, setShowDspForm] = useState(true);
@@ -1092,7 +1092,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
       setProfileName("Harbor Brew Zero — US Standard");
       setProfileNamed(false);
       setProfileNameExpanded(false);
-      setConnectedDsps([{ platform: "ttd", platformLabel: "The Trade Desk", seatId: "HBZERO-001" }]);
+      setConnectedDsps([]);
       setDspFormPlatform("");
       setDspFormSeatId("");
       setShowDspForm(true);
@@ -2257,12 +2257,10 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                   <span className="text-body3 text-cool-600">KPIs</span>
                   <span className="text-body3 font-medium text-grass-700">Validated</span>
                 </div>
-                {connectedDsps.length > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-body3 text-cool-600">DSP Connected</span>
-                    <span className="text-body3 font-medium text-cool-900">{connectedDsps[0].platformLabel}</span>
-                  </div>
-                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-body3 text-cool-600">DSP</span>
+                  <span className="text-body3 font-medium text-cool-900">The Trade Desk</span>
+                </div>
               </div>
             </div>
             <button
