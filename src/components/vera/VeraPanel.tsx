@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { X, Sparkles, Send, Globe, FileText, Loader2, ShieldCheck, Maximize2, Minimize2, Check, ChevronDown, ChevronRight, ExternalLink, Star, AlertTriangle, Zap, Plus, Upload, Copy, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -995,6 +996,7 @@ interface VeraPanelProps {
 }
 
 export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps) {
+  const navigate = useNavigate();
   const { setProfileCreated } = useVeraContext();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
@@ -2464,14 +2466,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               <div className="space-y-2">
                 <p className="text-body3 text-cool-600 text-center">You're all set! Where would you like to go next?</p>
                 <button
-                  onClick={() => { window.location.href = "/dv-pinnacle-v2/brand-safety"; }}
+                  onClick={() => { onClose(); navigate("/brand-safety"); }}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-25 transition-colors text-left"
                 >
                   <ShieldCheck className="h-4 w-4 text-plum-600 flex-shrink-0" />
                   <span className="text-body3 font-medium text-cool-900">Brand Safety Dashboard</span>
                 </button>
                 <button
-                  onClick={() => { window.location.href = "/dv-pinnacle-v2/"; }}
+                  onClick={() => { onClose(); navigate("/"); }}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-25 transition-colors text-left"
                 >
                   <BarChart3 className="h-4 w-4 text-plum-600 flex-shrink-0" />
