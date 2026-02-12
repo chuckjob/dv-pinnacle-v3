@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Sparkles, Send, Globe, FileText, Loader2, ShieldCheck, Maximize2, Minimize2, Check, ChevronDown, ChevronRight, ExternalLink, Star, AlertTriangle, Zap, Plus, Upload, Copy, BarChart3 } from "lucide-react";
+import { X, Sparkles, Send, Globe, FileText, Loader2, ShieldCheck, Maximize2, Minimize2, Check, ChevronDown, ChevronRight, ExternalLink, Star, AlertTriangle, Zap, Plus, Upload, Copy, BarChart3, MessageCircle, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { type VeraContext, useVeraContext } from "@/components/layout/AppLayout";
@@ -506,37 +506,55 @@ function ScibidsCampaignDetail({ campaign }: { campaign: typeof scibidsCampaigns
   const d = campaign.detail;
   return (
     <div className="space-y-3">
-      {/* Current State */}
-      <div className="rounded-lg border border-turquoise-100 bg-turquoise-25 p-3.5">
-        <p className="text-[11px] font-semibold text-turquoise-700 uppercase tracking-wider mb-2.5">Current State</p>
+      {/* Benefits summary */}
+      <p className="text-body3 text-cool-700">
+        Adding Scibids AI optimization to this campaign can help you reach more users at a lower cost while maintaining brand safety.
+      </p>
+
+      {/* Key stats */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-lg bg-turquoise-25 border border-turquoise-100 px-3 py-2.5 text-center">
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <TrendingDown className="h-3.5 w-3.5 text-turquoise-600" />
+            <span className="text-body3 font-semibold text-turquoise-700">Lower CPM</span>
+          </div>
+          <p className="text-body2 font-bold text-cool-900">{d.potentialCpm}</p>
+          <p className="text-caption text-cool-500">avg. projected CPM</p>
+        </div>
+        <div className="rounded-lg bg-turquoise-25 border border-turquoise-100 px-3 py-2.5 text-center">
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <TrendingUp className="h-3.5 w-3.5 text-grass-600" />
+            <span className="text-body3 font-semibold text-grass-700">More Reach</span>
+          </div>
+          <p className="text-body2 font-bold text-cool-900">+{d.reachGain}</p>
+          <p className="text-caption text-cool-500">estimated reach gain</p>
+        </div>
+      </div>
+
+      {/* How it works */}
+      <div className="rounded-lg border border-neutral-200 bg-white p-3">
+        <p className="text-[11px] font-semibold text-cool-500 uppercase tracking-wider mb-2">How Scibids Works</p>
         <div className="space-y-1.5">
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>Average CPM: <strong className="text-cool-900">{d.avgCpm}</strong> (meeting your {d.cpmTarget} target)</span>
+            <span>AI-driven bid optimization across 1,200+ placements</span>
           </div>
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>Scibids AI: {d.scibidsStatus}</span>
+            <span>Identifies brand-safe, low-CPM domains you're currently missing</span>
           </div>
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>Viewability: {d.viewability} (above category benchmark of {d.viewabilityBenchmark})</span>
+            <span>Optimizes 3x daily with no manual intervention</span>
           </div>
         </div>
       </div>
-      {/* Optimization Opportunity */}
-      <div className="rounded-lg border-l-4 border-l-turquoise-500 border border-neutral-200 bg-white p-3.5">
-        <p className="text-[11px] font-semibold text-turquoise-700 uppercase tracking-wider mb-2">Optimization Opportunity</p>
-        <p className="text-body3 text-cool-700 mb-2">
-          I found <strong>{d.avoidedDomains} avoided domains</strong> with CPM of <strong className="text-turquoise-700">{d.avoidedCpmRange}</strong> (below your average). They're brand-safe according to DV.
-        </p>
-        <div className="rounded-lg bg-turquoise-25 border border-turquoise-100 px-3 py-2 mb-2">
-          <p className="text-body3 text-cool-800">
-            <strong className="text-turquoise-700">Allowing them</strong> = Lower average CPM ({d.potentialCpm}) + {d.reachGain} more reach
-          </p>
-        </div>
-        <p className="text-body3 text-turquoise-500 italic">You're doing well — here's how to do even better.</p>
-      </div>
+
+      {/* CTA */}
+      <button className="w-full py-2.5 bg-turquoise-700 text-white text-body3 font-medium rounded-lg hover:bg-turquoise-600 transition-colors flex items-center justify-center gap-2">
+        <MessageCircle className="h-4 w-4" />
+        Chat live with an account manager
+      </button>
     </div>
   );
 }
@@ -867,7 +885,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-body3 font-medium text-cool-900">Enable Custom Contextual</p>
-                <p className="text-caption text-cool-500">Target content aligned with your brand values</p>
+                <p className="text-body3 text-cool-500">Target content aligned with your brand values</p>
               </div>
               <ChevronRight className="h-4 w-4 text-cool-400 flex-shrink-0" />
             </div>
@@ -877,7 +895,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-body3 font-medium text-cool-900">Activate Attention Metrics</p>
-                <p className="text-caption text-cool-500">Measure viewability and engagement per placement</p>
+                <p className="text-body3 text-cool-500">Measure viewability and engagement per placement</p>
               </div>
               <ChevronRight className="h-4 w-4 text-cool-400 flex-shrink-0" />
             </div>
@@ -964,28 +982,9 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
       {selectedScibids && !scibidsThinking && (
         <div ref={scibidsDetailRef} className="px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-100 rounded-bl-sm space-y-3">
           <p className="text-body3 text-cool-800">
-            Here's the Scibids AI analysis for <strong>{selectedScibids.name}</strong>:
+            Here's what Scibids AI can do for <strong>{selectedScibids.name}</strong>:
           </p>
           <ScibidsCampaignDetail campaign={selectedScibids} />
-          {/* Show domains CTA */}
-          {!showDomains && (
-            <button
-              onClick={() => {
-                setShowDomains(true);
-                setTimeout(() => {
-                  scibidsDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-                }, 100);
-              }}
-              className="w-full py-2.5 bg-turquoise-700 text-white text-body3 font-medium rounded-lg hover:bg-turquoise-500 transition-colors flex items-center justify-center gap-2"
-            >
-              <Globe className="h-4 w-4" />
-              Show domains
-            </button>
-          )}
-          {/* Domain Recommendations */}
-          {showDomains && (
-            <DomainRecommendations campaign={selectedScibids} />
-          )}
         </div>
       )}
     </div>
