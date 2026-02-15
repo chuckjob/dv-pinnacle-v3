@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Sparkles, Send, Globe, FileText, Loader2, ShieldCheck, Maximize2, Minimize2, Check, ChevronDown, ChevronRight, ExternalLink, Star, AlertTriangle, Zap, Plus, Upload, Copy, BarChart3, MessageCircle, TrendingDown, TrendingUp } from "lucide-react";
+import { X, Sparkles, Send, Globe, FileText, Loader2, ShieldCheck, Maximize2, Minimize2, Check, ChevronDown, ChevronRight, ExternalLink, Star, AlertTriangle, Zap, Plus, Upload, Copy, BarChart3, MessageCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { type VeraContext, useVeraContext } from "@/components/layout/AppLayout";
@@ -131,17 +131,39 @@ function BrandIntelligenceReport({ expanded }: { expanded: boolean }) {
         </div>
       </div>
       <div className="px-5 py-4 border-b border-neutral-100">
-        <p className="text-caption font-semibold text-cool-500 uppercase tracking-wider mb-2.5">Products & Services</p>
+        <p className="text-caption font-semibold text-cool-500 uppercase tracking-wider mb-2.5">Brand Context</p>
         <div className={cn("grid gap-2", expanded ? "grid-cols-4" : "grid-cols-2")}>
           {[
-            { name: "Zero-Alcohol Craft Beer", sub: "Flagship Product Line" },
-            { name: "Seasonal Brews", sub: "Limited Edition Releases" },
-            { name: "Variety Packs", sub: "Retail & DTC" },
-            { name: "Merchandise & Events", sub: "Brand Experiences" },
+            { name: "Non-Alcoholic Craft Beer", sub: "Product Category" },
+            { name: "Health-Conscious Positioning", sub: "Brand Strategy" },
+            { name: "Craft Brewing Heritage", sub: "Brand Identity" },
+            { name: "Alcohol-Free Lifestyle", sub: "Category Focus" },
           ].map((p) => (
             <div key={p.name} className="px-3 py-2 rounded-lg border border-neutral-100 bg-neutral-25">
               <p className="text-body3 font-medium text-cool-800">{p.name}</p>
               <p className="text-caption text-cool-500 mt-0.5">{p.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="px-5 py-4 border-b border-neutral-100">
+        <p className="text-caption font-semibold text-cool-500 uppercase tracking-wider mb-2.5">Campaign KPIs</p>
+        <div className="space-y-2">
+          {defaultKpiValues.map((kpi) => (
+            <div key={kpi.name} className="flex items-center justify-between px-3 py-2 rounded-lg border border-neutral-100 bg-neutral-25">
+              <div className="flex items-center gap-2">
+                <span className="text-body3 font-medium text-cool-800">{kpi.name}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-body3 font-semibold text-cool-900">{kpi.value}</span>
+                <span className="text-caption text-cool-500">Benchmark: {kpi.benchmark}</span>
+                <span className={cn(
+                  "px-1.5 py-0.5 rounded text-label font-medium",
+                  kpi.status === "aligned" ? "bg-grass-50 text-grass-700" : "bg-orange-50 text-orange-700"
+                )}>
+                  {kpi.status === "aligned" ? "✓ Aligned" : "Review"}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -171,22 +193,6 @@ function BrandIntelligenceReport({ expanded }: { expanded: boolean }) {
             </span>
           ))}
         </div>
-      </div>
-      <div className="px-5 py-4 bg-amber-50">
-        <p className="text-caption font-semibold text-amber-800 uppercase tracking-wider mb-2.5">Content Context to Consider</p>
-        <ul className="space-y-1.5">
-          {[
-            "Alcohol-related content (avoid association with alcoholic beverages)",
-            "Content promoting binge drinking or underage drinking",
-            "Competitive NA beer brands in editorial context",
-            "Health misinformation about non-alcoholic beverages",
-          ].map((item, i) => (
-            <li key={i} className="text-body3 text-cool-700 flex items-start gap-2">
-              <span className="text-amber-500 mt-0.5">•</span>
-              {item}
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );
@@ -319,9 +325,7 @@ type CampaignSetupPhase =
   | "brief-input"
   | "brief-analyzing"
   | "brand-intelligence"
-  | "kpi-validation"
   | "inconsistency-check"
-  | "unblock-recommendations"
   | "profile-naming"
   | "profile-review"
   | "dsp-connect"
@@ -346,6 +350,7 @@ const defaultKpiValues = [
 interface InconsistencyItem {
   id: number;
   type: "mismatch" | "unblock-recommendation";
+  title: string;
   description: string;
   severity: "high" | "medium" | "low";
   recommendation: string;
@@ -355,22 +360,38 @@ interface InconsistencyItem {
   topic?: string;
   industryBenchmark?: string;
   reachImpact?: string;
+  benefit?: string;
+  examples?: { url: string; status: string; reason: string; thumbnail?: string }[];
 }
 
 const profileInconsistencies: InconsistencyItem[] = [
   {
     id: 0,
     type: "mismatch",
+    title: "Overlapping Category Coverage",
     description: "'Iran — Water Crisis' is blocked under News & Politics, but 'Environmental News' is allowed — these topics frequently overlap and may cause inconsistent filtering.",
     severity: "medium",
     recommendation: "Block 'Iran — Water Crisis' under the Environment category as well to ensure consistent coverage.",
+    benefit: "Fixing this could reduce false blocks by ~3% and improve filtering consistency.",
+    examples: [
+      { url: "reuters.com/world/middle-east/iran-water-shortage", status: "Blocked", reason: "Matched 'Iran' under News & Politics", thumbnail: "https://images.unsplash.com/photo-1504297050568-910d24c426d3?w=280&h=160&fit=crop" },
+      { url: "reuters.com/environment/water-crisis-middle-east", status: "Allowed", reason: "Classified as Environmental News", thumbnail: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=280&h=160&fit=crop" },
+      { url: "bbc.com/news/iran-drought-water-crisis", status: "Blocked", reason: "Matched 'Iran' under News & Politics", thumbnail: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=280&h=160&fit=crop" },
+    ],
   },
   {
     id: 1,
     type: "mismatch",
+    title: "Keyword Over-Filtering",
     description: "The keyword 'election' is set to full-block, which may over-filter educational and non-partisan election coverage.",
     severity: "low",
     recommendation: "Narrow the 'election' keyword block to exclude educational content so informational articles aren't suppressed.",
+    benefit: "Narrowing this filter could recover ~2% of safe inventory.",
+    examples: [
+      { url: "pbs.org/education/how-elections-work", status: "Blocked", reason: "Keyword 'election' full-block", thumbnail: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=280&h=160&fit=crop" },
+      { url: "bbc.com/news/election-guide-2026", status: "Blocked", reason: "Keyword 'election' full-block", thumbnail: "https://images.unsplash.com/photo-1494172961521-33799ddd43a5?w=280&h=160&fit=crop" },
+      { url: "civics101.org/voting-process-explained", status: "Allowed", reason: "No keyword match", thumbnail: "https://images.unsplash.com/photo-1577495508048-b635879837f1?w=280&h=160&fit=crop" },
+    ],
   },
 ];
 
@@ -378,6 +399,7 @@ const unblockRecommendationItems: InconsistencyItem[] = [
   {
     id: 10,
     type: "unblock-recommendation",
+    title: "Reach Opportunity",
     topic: "Political Content",
     description: "'Political Content' is blocked on your current profile, but 78% of CPG Beverage brands allow it.",
     severity: "low",
@@ -388,6 +410,7 @@ const unblockRecommendationItems: InconsistencyItem[] = [
   {
     id: 11,
     type: "unblock-recommendation",
+    title: "Reach Opportunity",
     topic: "Gambling",
     description: "'Gambling' is blocked on your current profile, but 65% of CPG Beverage brands allow it.",
     severity: "low",
@@ -396,6 +419,62 @@ const unblockRecommendationItems: InconsistencyItem[] = [
     reachImpact: "+2.1%",
   },
 ];
+
+/* ── Example row with preview thumbnail on hover ─────────────────── */
+function ExampleRow({ ex }: { ex: { url: string; status: string; reason: string; thumbnail?: string } }) {
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const eyeRef = useRef<HTMLDivElement>(null);
+
+  const showTooltip = () => {
+    if (eyeRef.current) {
+      const rect = eyeRef.current.getBoundingClientRect();
+      setTooltipPos({ x: rect.left + rect.width / 2, y: rect.top });
+    }
+  };
+  const hideTooltip = () => setTooltipPos(null);
+
+  return (
+    <div className="px-2.5 py-2 rounded-md bg-neutral-50 border border-neutral-100">
+      {/* Row 1: Status chip + URL + Eye icon (right-aligned) */}
+      <div className="flex items-center gap-2">
+        <span className={cn(
+          "px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide flex-shrink-0",
+          ex.status === "Blocked" ? "bg-tomato-50 text-tomato-700" : "bg-grass-50 text-grass-700"
+        )}>
+          {ex.status}
+        </span>
+        <span className="text-body3 text-cool-700 truncate flex-1" title={ex.url}>
+          {ex.url}
+        </span>
+        {ex.thumbnail && (
+          <div
+            ref={eyeRef}
+            className="flex-shrink-0 cursor-pointer"
+            onMouseEnter={showTooltip}
+            onMouseLeave={hideTooltip}
+          >
+            <Eye className="h-4 w-4 text-plum-600 hover:text-plum-700 transition-colors" />
+            {tooltipPos && (
+              <div
+                className="fixed z-[9999] pointer-events-none"
+                style={{ left: tooltipPos.x, top: tooltipPos.y, transform: "translate(-50%, -100%)" }}
+              >
+                <div className="mb-2 rounded-lg overflow-hidden shadow-xl border border-neutral-200 bg-white">
+                  <img src={ex.thumbnail} alt={ex.url} className="w-[200px] h-[112px] object-cover" />
+                  <div className="px-2 py-1.5 bg-white border-t border-neutral-100">
+                    <p className="text-[10px] text-cool-500 truncate max-w-[196px]">{ex.url}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* Row 2: Reason text */}
+      <p className="text-label text-cool-500 mt-1">{ex.reason}</p>
+    </div>
+  );
+}
 
 /* ========== MAIN VERA PANEL ========== */
 
@@ -428,13 +507,13 @@ function AnalyzeUrlCard({ url }: { url: typeof analyzeBlockedUrls[0]["urls"][0] 
         <div className="flex items-center gap-2 flex-wrap mb-2">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-900 text-amber-50 text-[12px] leading-[16px] font-semibold">
             <Star className="w-3 h-3 fill-current" />
-            Rockerbox
+            DV Attribution
           </span>
           <span className="text-body3 text-cool-700">
             {url.attribution}
           </span>
           <span className="text-caption text-cool-500">·</span>
-          <span className="text-caption text-grass-700 font-medium">
+          <span className="text-body3 text-grass-700 font-medium">
             Avg CPM: $2.40
           </span>
         </div>
@@ -478,8 +557,8 @@ function AnalyzeUrlCard({ url }: { url: typeof analyzeBlockedUrls[0]["urls"][0] 
   );
 }
 
-// Scibids campaign data
-const scibidsCampaigns = [
+// DV Performance campaign data
+const performanceCampaigns = [
   {
     name: "Q1 2026 Harbor Brew Zero",
     description: "Brand awareness for new product launch",
@@ -488,64 +567,65 @@ const scibidsCampaigns = [
     primary: "Low CPM (Target: <$2.70)",
     secondary: "Maximum Reach",
     detail: {
-      avgCpm: "$2.65",
-      cpmTarget: "<$2.70",
-      cpmMet: true,
-      scibidsStatus: "Active, optimizing 3x daily across 1,200+ placements",
-      viewability: "78%",
-      viewabilityBenchmark: "72%",
+      kpis: [
+        { name: "Block Rate", current: "8.7%", target: "< 7%", projected: "5.8%", improvement: "-2.9%", meetsTarget: true },
+        { name: "CPM", current: "$8.70", target: "< $7.00", projected: "$6.40", improvement: "-$2.30", meetsTarget: true },
+        { name: "Viewability", current: "68%", target: "> 70%", projected: "76%", improvement: "+8%", meetsTarget: true },
+        { name: "Suitability", current: "91.3%", target: "> 93%", projected: "95.1%", improvement: "+3.8%", meetsTarget: true },
+      ],
       avoidedDomains: 3,
-      avoidedCpmRange: "$1.80-$2.20",
-      potentialCpm: "$2.40",
-      reachGain: "19%",
+      performanceStatus: "Active, optimizing 3x daily across 1,200+ placements",
     },
   },
 ];
 
-function ScibidsCampaignDetail({ campaign }: { campaign: typeof scibidsCampaigns[0] }) {
+function PerformanceCampaignDetail({ campaign }: { campaign: typeof performanceCampaigns[0] }) {
   const d = campaign.detail;
   return (
     <div className="space-y-3">
       {/* Benefits summary */}
       <p className="text-body3 text-cool-700">
-        Adding Scibids AI optimization to this campaign can help you reach more users at a lower cost while maintaining brand safety.
+        Based on your campaign brief, DV Performance can optimize across all four of your KPIs — here's the projected impact:
       </p>
 
-      {/* Key stats */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-lg bg-turquoise-25 border border-turquoise-100 px-3 py-2.5 text-center">
-          <div className="flex items-center justify-center gap-1.5 mb-1">
-            <TrendingDown className="h-3.5 w-3.5 text-turquoise-600" />
-            <span className="text-body3 font-semibold text-turquoise-700">Lower CPM</span>
-          </div>
-          <p className="text-body2 font-bold text-cool-900">{d.potentialCpm}</p>
-          <p className="text-caption text-cool-500">avg. projected CPM</p>
+      {/* KPI impact table */}
+      <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden">
+        <div className="px-3 py-2 bg-gradient-to-r from-turquoise-25 to-white border-b border-neutral-100">
+          <p className="text-[11px] font-semibold text-cool-500 uppercase tracking-wider">Projected KPI Impact</p>
         </div>
-        <div className="rounded-lg bg-turquoise-25 border border-turquoise-100 px-3 py-2.5 text-center">
-          <div className="flex items-center justify-center gap-1.5 mb-1">
-            <TrendingUp className="h-3.5 w-3.5 text-grass-600" />
-            <span className="text-body3 font-semibold text-grass-700">More Reach</span>
+        <div className="divide-y divide-neutral-100">
+          <div className="grid grid-cols-4 gap-2 px-3 py-1.5 bg-neutral-50">
+            <span className="text-[11px] font-semibold text-cool-400 uppercase tracking-wider">KPI</span>
+            <span className="text-[11px] font-semibold text-cool-400 uppercase tracking-wider text-center">Current</span>
+            <span className="text-[11px] font-semibold text-cool-400 uppercase tracking-wider text-center">Target</span>
+            <span className="text-[11px] font-semibold text-cool-400 uppercase tracking-wider text-center">Projected</span>
           </div>
-          <p className="text-body2 font-bold text-cool-900">+{d.reachGain}</p>
-          <p className="text-caption text-cool-500">estimated reach gain</p>
+          {d.kpis.map((kpi) => (
+            <div key={kpi.name} className="grid grid-cols-4 gap-2 px-3 py-2 items-center">
+              <span className="text-body3 font-medium text-cool-800">{kpi.name}</span>
+              <span className="text-body3 text-cool-500 text-center">{kpi.current}</span>
+              <span className="text-body3 text-cool-500 text-center">{kpi.target}</span>
+              <span className={cn("text-body3 font-bold text-center", kpi.meetsTarget ? "text-grass-700" : "text-orange-700")}>{kpi.projected}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* How it works */}
       <div className="rounded-lg border border-neutral-200 bg-white p-3">
-        <p className="text-[11px] font-semibold text-cool-500 uppercase tracking-wider mb-2">How Scibids Works</p>
+        <p className="text-[11px] font-semibold text-cool-500 uppercase tracking-wider mb-2">How DV Performance Works</p>
         <div className="space-y-1.5">
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>AI-driven bid optimization across 1,200+ placements</span>
+            <span>AI-driven bid optimization targeting your KPI goals</span>
           </div>
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>Identifies brand-safe, low-CPM domains you're currently missing</span>
+            <span>Balances block rate, CPM, viewability, and suitability together</span>
           </div>
           <div className="flex items-start gap-2 text-body3 text-cool-700">
             <Check className="h-3.5 w-3.5 text-turquoise-500 flex-shrink-0 mt-0.5" />
-            <span>Optimizes 3x daily with no manual intervention</span>
+            <span>Optimizes 3x daily across 1,200+ placements</span>
           </div>
         </div>
       </div>
@@ -565,7 +645,7 @@ const domainRecommendations = [
   { domain: "eatingwell.com", category: "Food & Nutrition", cpm: "$2.05", viewability: "75%", weeklyImps: "330K" },
 ];
 
-function DomainRecommendations({ campaign }: { campaign: typeof scibidsCampaigns[0] }) {
+function DomainRecommendations({ campaign }: { campaign: typeof performanceCampaigns[0] }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedDomains, setSelectedDomains] = useState<Set<string>>(new Set());
 
@@ -671,11 +751,11 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
   onDismissExamples: () => void;
   cardWidth: string;
 }) {
-  const [selectedScibids, setSelectedScibids] = useState<typeof scibidsCampaigns[0] | null>(null);
-  const [scibidsThinking, setScibidsThinking] = useState(false);
+  const [selectedPerformance, setSelectedPerformance] = useState<typeof performanceCampaigns[0] | null>(null);
+  const [performanceThinking, setPerformanceThinking] = useState(false);
   const [showDomains, setShowDomains] = useState(false);
   const [unblockedTopics, setUnblockedTopics] = useState<Set<string>>(new Set());
-  const scibidsDetailRef = useRef<HTMLDivElement>(null);
+  const performanceDetailRef = useRef<HTMLDivElement>(null);
 
   const impactChipStyles = {
     high: { bg: "bg-tomato-50", text: "text-tomato-700", dot: "bg-tomato-500" },
@@ -792,7 +872,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
                           <div className="text-body3 font-medium text-cool-900 mb-0.5">nytimes.com/2024/world/middle-east/...</div>
                           <div className="text-caption text-cool-500 mb-2">nytimes.com/2024/world/middle-east</div>
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-200 text-cool-500 text-[12px] leading-[16px] font-semibold">Rockerbox</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-200 text-cool-500 text-[12px] leading-[16px] font-semibold">DV Attribution</span>
                             <span className="text-body3 text-cool-500">Attribution: 9.1/10</span>
                           </div>
                         </div>
@@ -803,7 +883,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
                           <div className="text-body3 font-medium text-cool-900 mb-0.5">washingtonpost.com/world/2024/...</div>
                           <div className="text-caption text-cool-500 mb-2">washingtonpost.com/world/2024</div>
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-200 text-cool-500 text-[12px] leading-[16px] font-semibold">Rockerbox</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-200 text-cool-500 text-[12px] leading-[16px] font-semibold">DV Attribution</span>
                             <span className="text-body3 text-cool-500">Attribution: 8.7/10</span>
                           </div>
                         </div>
@@ -811,7 +891,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-white/60">
                       <button className="flex items-center gap-1.5 px-4 py-2 bg-amber-900 text-amber-50 text-body3 font-semibold rounded-lg hover:bg-amber-800 transition-colors shadow-sm">
-                        <Star className="w-3.5 h-3.5 fill-current" /> Upgrade to Rockerbox
+                        <Star className="w-3.5 h-3.5 fill-current" /> Upgrade to DV Attribution
                       </button>
                     </div>
                   </div>
@@ -874,36 +954,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
         </div>
       )}
 
-      {/* DV Tools Upsell */}
-      {(phase === "examples" || phase === "complete") && (
-        <div className="rounded-xl border border-plum-100 bg-plum-25 p-4">
-          <p className="text-body3 font-semibold text-cool-900 mb-3">2 Improvement Opportunities</p>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-neutral-200 hover:border-plum-200 transition-colors cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-turquoise-25 flex items-center justify-center flex-shrink-0">
-                <Globe className="h-4 w-4 text-turquoise-700" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-body3 font-medium text-cool-900">Enable Custom Contextual</p>
-                <p className="text-body3 text-cool-500">Target content aligned with your brand values</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-cool-400 flex-shrink-0" />
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-neutral-200 hover:border-plum-200 transition-colors cursor-pointer">
-              <div className="w-8 h-8 rounded-lg bg-plum-50 flex items-center justify-center flex-shrink-0">
-                <Zap className="h-4 w-4 text-plum-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-body3 font-medium text-cool-900">Activate Attention Metrics</p>
-                <p className="text-body3 text-cool-500">Measure viewability and engagement per placement</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-cool-400 flex-shrink-0" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Scibids upsell card */}
+      {/* DV Performance upsell card */}
       {(phase === "examples" || phase === "complete") && (
         <div className="rounded-xl border border-turquoise-100 bg-gradient-to-br from-turquoise-25 to-turquoise-100 p-4">
           <div className="flex items-start gap-3">
@@ -912,37 +963,62 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1.5">
-                <p className="text-body3 font-semibold text-cool-900">Activate Scibids AI Optimization</p>
+                <p className="text-body3 font-semibold text-cool-900">Activate DV Performance Optimization</p>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] leading-[16px] font-medium text-turquoise-700 bg-turquoise-25 border border-turquoise-100">
                   <span className="w-1.5 h-1.5 rounded-full bg-turquoise-500" />
                   Premium
                 </span>
               </div>
-              <p className="text-body3 text-cool-600 mb-3">Get personalized recommendations powered by Scibids AI.</p>
+              <p className="text-body3 text-cool-600 mb-3">DV Performance allows you to optimize your campaign based on your KPIs — automatically adjusting bids to hit your Target Block Rate, CPM, and Viewability goals.</p>
+              {/* Domain teaser */}
+              <div className="rounded-lg border border-grass-200 bg-grass-25 p-3 mb-3">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Globe className="h-3.5 w-3.5 text-grass-600" />
+                  <span className="text-body3 font-semibold text-cool-900">Domains You're Missing</span>
+                </div>
+                <p className="text-caption text-cool-600 mb-2">These are on your blocklist but meet your brand safety requirements</p>
+                <div className="space-y-1.5">
+                  {domainRecommendations.slice(0, 2).map((d) => (
+                    <div key={d.domain} className="flex items-center justify-between px-2.5 py-2 rounded-md bg-white border border-grass-100">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-3.5 w-3.5 text-grass-500" />
+                        <div>
+                          <p className="text-body3 font-medium text-cool-900">{d.domain}</p>
+                          <p className="text-caption text-cool-500">{d.category}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-body3 font-semibold text-grass-700">{d.cpm}</p>
+                        <p className="text-caption text-cool-500">CPM</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="bg-white rounded-lg border border-neutral-100 divide-y divide-neutral-100">
-                {scibidsCampaigns.map((c) => (
+                {performanceCampaigns.map((c) => (
                   <button
                     key={c.name}
                     onClick={() => {
-                      if (selectedScibids?.name === c.name) {
-                        setSelectedScibids(null);
-                        setScibidsThinking(false);
+                      if (selectedPerformance?.name === c.name) {
+                        setSelectedPerformance(null);
+                        setPerformanceThinking(false);
                         setShowDomains(false);
                       } else {
-                        setSelectedScibids(c);
-                        setScibidsThinking(true);
+                        setSelectedPerformance(c);
+                        setPerformanceThinking(true);
                         setShowDomains(false);
                         setTimeout(() => {
-                          setScibidsThinking(false);
+                          setPerformanceThinking(false);
                           setTimeout(() => {
-                            scibidsDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            performanceDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                           }, 100);
                         }, 2000);
                       }
                     }}
                     className={cn(
                       "w-full text-left px-3.5 py-3 hover:bg-turquoise-25 transition-colors group",
-                      selectedScibids?.name === c.name && "bg-turquoise-25"
+                      selectedPerformance?.name === c.name && "bg-turquoise-25"
                     )}
                   >
                     <div className="flex items-start justify-between">
@@ -959,7 +1035,7 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
                       </div>
                     </div>
                     <div className="flex items-center gap-1 mt-2 text-turquoise-700 text-body3 font-medium">
-                      Analyze with Scibids AI
+                      Analyze with DV Performance
                       <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                   </button>
@@ -970,21 +1046,21 @@ function AnalyzeFlowContent({ phase, onShowExamples, onDismissExamples, cardWidt
         </div>
       )}
 
-      {/* Scibids thinking spinner */}
-      {selectedScibids && scibidsThinking && (
+      {/* DV Performance thinking spinner */}
+      {selectedPerformance && performanceThinking && (
         <div className="flex items-center gap-2 self-start px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-100 rounded-bl-sm">
           <Loader2 className="h-4 w-4 text-turquoise-500 animate-spin" />
-          <span className="text-body3 text-cool-600">Analyzing {selectedScibids.name}...</span>
+          <span className="text-body3 text-cool-600">Analyzing {selectedPerformance.name}...</span>
         </div>
       )}
 
-      {/* Scibids detail — rendered as a separate agent response card */}
-      {selectedScibids && !scibidsThinking && (
-        <div ref={scibidsDetailRef} className="px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-100 rounded-bl-sm space-y-3">
+      {/* DV Performance detail — rendered as a separate agent response card */}
+      {selectedPerformance && !performanceThinking && (
+        <div ref={performanceDetailRef} className="px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-100 rounded-bl-sm space-y-3">
           <p className="text-body3 text-cool-800">
-            Here's what Scibids AI can do for <strong>{selectedScibids.name}</strong>:
+            Here's what DV Performance can do for <strong>{selectedPerformance.name}</strong>:
           </p>
-          <ScibidsCampaignDetail campaign={selectedScibids} />
+          <PerformanceCampaignDetail campaign={selectedPerformance} />
         </div>
       )}
     </div>
@@ -1036,18 +1112,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
   // Step 3: BI Report
   const [biApproved, setBiApproved] = useState(false);
   const [biExpanded, setBiExpanded] = useState(false);
-  // Step 4: KPIs
-  const [kpiValues, setKpiValues] = useState(defaultKpiValues);
-  const [kpisApproved, setKpisApproved] = useState(false);
-  const [kpiExpanded, setKpiExpanded] = useState(false);
-  // Step 5: Inconsistencies
+  // Step 4: Inconsistencies
   const [inconsistenciesResolved, setInconsistenciesResolved] = useState(false);
   const [inconsistenciesExpanded, setInconsistenciesExpanded] = useState(false);
   const [acceptedInconsistencies, setAcceptedInconsistencies] = useState<Set<number>>(new Set());
-  // Step 5b: Unblock Recommendations
+  // Step 5b: Inline unblock recommendation
   const [unblockDecisions, setUnblockDecisions] = useState<Map<number, "unblock" | "keep">>(new Map());
-  const [unblockResolved, setUnblockResolved] = useState(false);
-  const [unblockExpanded, setUnblockExpanded] = useState(false);
+  // Expandable examples in inconsistency cards
+  const [expandedExamples, setExpandedExamples] = useState<Set<number>>(new Set());
   // Step 6: DSP Connect
   const [dspConnected, setDspConnected] = useState(false);
   // Step 7: Profile naming
@@ -1088,15 +1160,11 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
       setBriefExpanded(false);
       setBiApproved(false);
       setBiExpanded(false);
-      setKpiValues(defaultKpiValues);
-      setKpisApproved(false);
-      setKpiExpanded(false);
       setInconsistenciesResolved(false);
       setInconsistenciesExpanded(false);
       setAcceptedInconsistencies(new Set());
       setUnblockDecisions(new Map());
-      setUnblockResolved(false);
-      setUnblockExpanded(false);
+      setExpandedExamples(new Set());
       setProfileName("Harbor Brew Zero — US Standard");
       setProfileNamed(false);
       setProfileNameExpanded(false);
@@ -1903,116 +1971,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
               onClick={() => {
                 setBiApproved(true);
                 const approveMsg: Message = { id: `approve-bi-${Date.now()}`, role: "user", content: "Looks good, approve the Brand Intelligence Report." };
-                const veraMsg: Message = { id: `vera-kpi-${Date.now()}`, role: "vera", content: "Great! Now let me validate your campaign KPIs against industry benchmarks for the CPG - Beverages sector." };
+                const veraMsg: Message = { id: `vera-inconsistency-${Date.now()}`, role: "vera", content: "I've reviewed your profile and have some recommended improvements based on your brand context and industry benchmarks." };
                 setMessages(prev => [...prev, approveMsg, veraMsg]);
-                setSetupPhase("kpi-validation");
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
-            >
-              <Check className="h-4 w-4" />
-              Approve Report
-            </button>
-            <button className="w-full text-body3 text-cool-500 hover:text-cool-700 underline underline-offset-2 py-1">
-              Switch to manual configuration
-            </button>
-          </div>
-        )}
-
-        {/* Phase 3: KPI Validation — compact approved state */}
-        {isCampaignSetup && kpisApproved && setupPhase !== "kpi-validation" && (
-          <div className={cn("self-start space-y-2", cardWidth)}>
-            <button
-              onClick={() => setKpiExpanded(prev => !prev)}
-              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-grass-50 border border-grass-200 hover:bg-grass-100 transition-colors"
-            >
-              <div className="w-5 h-5 rounded-full bg-grass-500 flex items-center justify-center flex-shrink-0">
-                <Check className="h-3 w-3 text-white" />
-              </div>
-              <span className="text-body3 font-medium text-grass-700 flex-1 text-left">Campaign KPIs approved</span>
-              {kpiExpanded ? <ChevronDown className="h-3.5 w-3.5 text-grass-500" /> : <ChevronRight className="h-3.5 w-3.5 text-grass-500" />}
-            </button>
-            {kpiExpanded && (
-              <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-gradient-to-r from-turquoise-25 to-white border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-turquoise-700" />
-                    <span className="text-body3 font-semibold text-cool-900">Campaign KPI Validation</span>
-                  </div>
-                  <p className="text-body3 text-cool-500 mt-1">Industry: CPG — Beverages Sector</p>
-                </div>
-                <div className="divide-y divide-neutral-100">
-                  {kpiValues.map((kpi, kpiIdx) => (
-                    <div key={kpi.name} className="px-5 py-3 flex items-center justify-between">
-                      <div>
-                        <p className="text-body3 font-medium text-cool-800">{kpi.name}</p>
-                        <p className="text-caption text-cool-500">Benchmark: {kpi.benchmark}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-body3 font-semibold text-cool-900">{kpi.value}</span>
-                        <span className={cn(
-                          "px-2 py-0.5 rounded-full text-label font-medium",
-                          kpi.status === "aligned" ? "bg-grass-50 text-grass-700" : "bg-orange-50 text-orange-700"
-                        )}>
-                          {kpi.status === "aligned" ? "Aligned" : "Review"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {/* Phase 3: KPI Validation — full view */}
-        {isCampaignSetup && setupPhase === "kpi-validation" && (
-          <div className={cn("space-y-3 self-start", cardWidth)}>
-            <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-              <div className="px-5 py-4 bg-gradient-to-r from-turquoise-25 to-white border-b border-neutral-100">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-turquoise-700" />
-                  <span className="text-body3 font-semibold text-cool-900">Campaign KPI Validation</span>
-                </div>
-                <p className="text-body3 text-cool-500 mt-1">Industry: CPG — Beverages Sector</p>
-              </div>
-              <div className="divide-y divide-neutral-100">
-                {kpiValues.map((kpi, kpiIdx) => (
-                  <div key={kpi.name} className="px-5 py-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-body3 font-medium text-cool-800">{kpi.name}</p>
-                      <p className="text-caption text-cool-500">Benchmark: {kpi.benchmark}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={kpi.value}
-                        onChange={(e) => {
-                          setKpiValues(prev => prev.map((k, i) => i === kpiIdx ? { ...k, value: e.target.value } : k));
-                        }}
-                        className="w-20 text-right text-body3 font-semibold text-cool-900 bg-transparent border-b border-neutral-200 hover:border-neutral-300 focus:border-plum-400 outline-none px-1 py-0.5"
-                      />
-                      <span className={cn(
-                        "px-2 py-0.5 rounded-full text-label font-medium",
-                        kpi.status === "aligned" ? "bg-grass-50 text-grass-700" : "bg-orange-50 text-orange-700"
-                      )}>
-                        {kpi.status === "aligned" ? "Aligned" : "Review"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                setKpisApproved(true);
-                const msg: Message = { id: `approve-kpi-${Date.now()}`, role: "user", content: "KPIs look aligned. Continue." };
-                const veraMsg: Message = { id: `vera-inconsistency-${Date.now()}`, role: "vera", content: "I've reviewed your profile configuration and found some inconsistencies to address." };
-                setMessages(prev => [...prev, msg, veraMsg]);
                 setSetupPhase("inconsistency-check");
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
             >
               <Check className="h-4 w-4" />
-              Approve KPIs
+              Approve Report
             </button>
             <button className="w-full text-body3 text-cool-500 hover:text-cool-700 underline underline-offset-2 py-1">
               Switch to manual configuration
@@ -2031,7 +1997,7 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 <Check className="h-3 w-3 text-white" />
               </div>
               <span className="text-body3 font-medium text-grass-700 flex-1 text-left">
-                Inconsistencies resolved ({acceptedInconsistencies.size} accepted)
+                Profile improvements applied ({acceptedInconsistencies.size} accepted)
               </span>
               {inconsistenciesExpanded ? <ChevronDown className="h-3.5 w-3.5 text-grass-500" /> : <ChevronRight className="h-3.5 w-3.5 text-grass-500" />}
             </button>
@@ -2042,41 +2008,158 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
           <div className={cn("space-y-3 self-start", cardWidth)}>
             <div className="rounded-xl border border-orange-200 bg-orange-25 p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-orange-600" />
-                <span className="text-body3 font-semibold text-cool-900">Profile Inconsistencies</span>
+                <Sparkles className="h-4 w-4 text-orange-600" />
+                <span className="text-body3 font-semibold text-cool-900">Recommended Profile Improvements</span>
               </div>
-              <p className="text-body3 text-cool-600">We found conflicting settings in your profile that may affect brand safety coverage.</p>
-              {profileInconsistencies.map((issue) => (
-                <div key={issue.id} className={cn("rounded-lg border bg-white p-3", acceptedInconsistencies.has(issue.id) ? "border-grass-200" : "border-neutral-200")}>
-                  <div className="mb-2">
-                    <span className={cn(
-                      "px-1.5 py-0.5 rounded text-label font-medium",
-                      acceptedInconsistencies.has(issue.id) ? "bg-grass-50 text-grass-700" : issue.severity === "medium" ? "bg-orange-50 text-orange-700" : "bg-neutral-50 text-cool-600"
-                    )}>
-                      {acceptedInconsistencies.has(issue.id) ? "Accepted" : issue.severity === "medium" ? "Medium" : "Low"}
-                    </span>
-                  </div>
-                  <p className="text-body3 text-cool-700 mb-2">{issue.description}</p>
-                  <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-plum-25 border border-plum-100">
-                    <Sparkles className="h-3.5 w-3.5 text-plum-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-body3 text-plum-700">{issue.recommendation}</p>
-                  </div>
-                  {!acceptedInconsistencies.has(issue.id) ? (
-                    <button
-                      onClick={() => setAcceptedInconsistencies(prev => new Set([...prev, issue.id]))}
-                      className="mt-2 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-plum-50 text-plum-700 text-body3 font-medium hover:bg-plum-100 transition-colors"
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                      Accept recommendation
-                    </button>
-                  ) : (
-                    <div className="mt-2 flex items-center gap-1.5 text-body3 font-medium text-grass-600">
-                      <Check className="h-3.5 w-3.5" />
-                      Recommendation accepted
+              <p className="text-body3 text-cool-600">I've aligned this profile based on your brand context and industry benchmarks. Here are a few additional improvements to consider.</p>
+              {profileInconsistencies.map((issue) => {
+                const isExampleExpanded = expandedExamples.has(issue.id);
+                const isAccepted = acceptedInconsistencies.has(issue.id);
+                return (
+                  <div key={issue.id} className={cn("rounded-lg border p-3", isAccepted ? "border-grass-200 bg-grass-25" : "border-turquoise-200 bg-turquoise-25")}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Sparkles className={cn("h-3.5 w-3.5", isAccepted ? "text-grass-600" : "text-turquoise-600")} />
+                      <span className="text-body3 font-semibold text-cool-900">
+                        {issue.id === 0 ? "Recommendation: Fix Overlapping Category Coverage" : "Recommendation: Improve Keyword Over-Filtering"}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <span className="text-body3 font-medium text-cool-900">{issue.title}</span>
+                      {isAccepted ? (
+                        <span className="px-1.5 py-0.5 rounded bg-grass-50 text-grass-700 text-label font-medium">Applied</span>
+                      ) : (
+                        <span className={cn(
+                          "px-1.5 py-0.5 rounded font-medium text-[12px] leading-[16px]",
+                          issue.severity === "medium" ? "bg-orange-50 text-orange-700" : "bg-neutral-50 text-cool-600"
+                        )}>
+                          {issue.severity === "medium" ? "Medium Priority" : "Low Priority"}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-body3 text-cool-700 mb-1">{issue.description}</p>
+                    {issue.benefit && (
+                      <p className="text-body3 font-medium text-turquoise-700 mb-2">{issue.benefit}</p>
+                    )}
+                    {/* Expanded examples */}
+                    {isExampleExpanded && issue.examples && (
+                      <div className="mb-2 space-y-1">
+                        {issue.examples.map((ex, i) => (
+                          <ExampleRow key={i} ex={ex} />
+                        ))}
+                      </div>
+                    )}
+                    {/* Action row: Show example (left) + Apply Fix / Skip (right) */}
+                    {!isAccepted ? (
+                      <div className="flex items-center justify-between">
+                        {issue.examples && (
+                          <button
+                            onClick={() => setExpandedExamples(prev => {
+                              const next = new Set(prev);
+                              if (next.has(issue.id)) next.delete(issue.id);
+                              else next.add(issue.id);
+                              return next;
+                            })}
+                            className="inline-flex items-center gap-1 text-body3 font-medium text-plum-600 hover:text-plum-700 transition-colors"
+                          >
+                            {isExampleExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                            {isExampleExpanded ? "Hide example" : "Show example"}
+                          </button>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setAcceptedInconsistencies(prev => new Set([...prev, issue.id]))}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                            Apply Fix
+                          </button>
+                          <button
+                            onClick={() => setAcceptedInconsistencies(prev => { const next = new Set(prev); next.delete(issue.id); return next; })}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-200 bg-white text-cool-700 text-body3 font-medium hover:bg-neutral-50 transition-colors"
+                          >
+                            Skip
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-body3 font-medium text-grass-600 justify-end">
+                        <Check className="h-3.5 w-3.5" />
+                        Fix applied
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Inline unblock recommendation */}
+              {(() => {
+                const decision = unblockDecisions.get(10);
+                return (
+                  <div className={cn("rounded-lg border p-3", decision === "unblock" ? "border-grass-200 bg-grass-25" : decision === "keep" ? "border-neutral-200 bg-white" : "border-turquoise-200 bg-turquoise-25")}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-turquoise-600" />
+                      <span className="text-body3 font-semibold text-cool-900">Recommendation: Consider Unblocking</span>
+                    </div>
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <span className="text-body3 font-medium text-cool-900">Political Content</span>
+                      {!decision && (
+                        <span className="px-1.5 py-0.5 rounded bg-plum-50 text-plum-600 text-label font-medium">Currently Blocked</span>
+                      )}
+                      {decision === "unblock" && (
+                        <span className="px-1.5 py-0.5 rounded bg-grass-50 text-grass-700 text-label font-medium">Unblocked</span>
+                      )}
+                      {decision === "keep" && (
+                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 text-cool-500 text-label font-medium">Kept Blocked</span>
+                      )}
+                    </div>
+                    <p className="text-body3 text-cool-700 mb-2">78% of CPG Beverage brands allow this — for a non-alcoholic beer brand, this poses minimal risk and could increase reach by ~4%.</p>
+                    {/* Expanded examples */}
+                    {expandedExamples.has(10) && (
+                      <div className="mb-2 space-y-1">
+                        {[
+                          { url: "pbs.org/politics/2026-policy-overview", status: "Blocked", reason: "Matched 'Political Content' category", thumbnail: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=280&h=160&fit=crop" },
+                          { url: "apnews.com/election-results-analysis", status: "Blocked", reason: "Matched 'Political Content' category", thumbnail: "https://images.unsplash.com/photo-1494172961521-33799ddd43a5?w=280&h=160&fit=crop" },
+                          { url: "reuters.com/business/economy-forecast", status: "Allowed", reason: "Classified as Business News", thumbnail: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=280&h=160&fit=crop" },
+                        ].map((ex, i) => (
+                          <ExampleRow key={i} ex={ex} />
+                        ))}
+                      </div>
+                    )}
+                    {/* Action row: Show example (left) + Unblock / Keep Blocked (right) */}
+                    {!decision && (
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => setExpandedExamples(prev => {
+                            const next = new Set(prev);
+                            if (next.has(10)) next.delete(10);
+                            else next.add(10);
+                            return next;
+                          })}
+                          className="inline-flex items-center gap-1 text-body3 font-medium text-plum-600 hover:text-plum-700 transition-colors"
+                        >
+                          {expandedExamples.has(10) ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                          {expandedExamples.has(10) ? "Hide example" : "Show example"}
+                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setUnblockDecisions(prev => new Map(prev).set(10, "unblock"))}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                            Unblock
+                          </button>
+                          <button
+                            onClick={() => setUnblockDecisions(prev => new Map(prev).set(10, "keep"))}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-200 bg-white text-cool-700 text-body3 font-medium hover:bg-neutral-50 transition-colors"
+                          >
+                            Keep Blocked
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             <button
@@ -2084,31 +2167,13 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 setInconsistenciesResolved(true);
                 const accepted = acceptedInconsistencies.size;
                 const msg: Message = { id: `resolve-inc-${Date.now()}`, role: "user", content: `Resolved ${accepted} inconsistencies. Continue.` };
-                const veraMsg: Message = { id: `vera-unblock-${Date.now()}`, role: "vera", content: "I've also identified some topics that could be safely unblocked based on industry benchmarks for CPG Beverages. This could help increase your campaign reach." };
+                const veraMsg: Message = { id: `vera-dsp-${Date.now()}`, role: "vera", content: "Great choices! Now let's connect your DSP so the profile can start optimizing campaign performance." };
                 setMessages(prev => [...prev, msg, veraMsg]);
-                setSetupPhase("unblock-recommendations");
+                setSetupPhase("dsp-connect");
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
             >
               Continue
-            </button>
-          </div>
-        )}
-
-        {/* Unblock Recommendations — compact resolved state */}
-        {isCampaignSetup && unblockResolved && setupPhase !== "unblock-recommendations" && (
-          <div className={cn("self-start space-y-2", cardWidth)}>
-            <button
-              onClick={() => setUnblockExpanded(prev => !prev)}
-              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-grass-50 border border-grass-200 hover:bg-grass-100 transition-colors"
-            >
-              <div className="w-5 h-5 rounded-full bg-grass-500 flex items-center justify-center flex-shrink-0">
-                <Check className="h-3 w-3 text-white" />
-              </div>
-              <span className="text-body3 font-medium text-grass-700 flex-1 text-left">
-                {[...unblockDecisions.values()].filter(v => v === "unblock").length} topics unblocked via benchmarks
-              </span>
-              {unblockExpanded ? <ChevronDown className="h-3.5 w-3.5 text-grass-500" /> : <ChevronRight className="h-3.5 w-3.5 text-grass-500" />}
             </button>
           </div>
         )}
@@ -2124,74 +2189,6 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                 Profile configuration complete. Your DSP has been connected.
               </span>
             </div>
-          </div>
-        )}
-
-        {/* Unblock Recommendations — full view */}
-        {isCampaignSetup && setupPhase === "unblock-recommendations" && (
-          <div className={cn("space-y-3 self-start", cardWidth)}>
-            <div className="rounded-xl border border-turquoise-100 bg-turquoise-25 p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-turquoise-600" />
-                <span className="text-body3 font-semibold text-cool-900">Topics to Consider Unblocking</span>
-              </div>
-              <p className="text-body3 text-cool-600">These topics were blocked on your previous profile but we recommend unblocking based on industry benchmarks.</p>
-              {unblockRecommendationItems.map((item) => {
-                const decision = unblockDecisions.get(item.id);
-                return (
-                  <div key={item.id} className={cn("rounded-lg border bg-white p-3", decision === "unblock" ? "border-grass-200" : decision === "keep" ? "border-neutral-200" : "border-neutral-200")}>
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className="text-body3 font-medium text-cool-900">{item.topic}</span>
-                      {!decision && (
-                        <span className="px-1.5 py-0.5 rounded bg-plum-50 text-plum-600 text-label font-medium">Currently Blocked</span>
-                      )}
-                      {decision === "unblock" && (
-                        <span className="px-1.5 py-0.5 rounded bg-grass-50 text-grass-700 text-label font-medium">Unblocked</span>
-                      )}
-                      {decision === "keep" && (
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 text-cool-500 text-label font-medium">Kept Blocked</span>
-                      )}
-                    </div>
-                    <p className="text-body3 text-cool-700 mb-1.5">{item.description}</p>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-caption text-cool-500">{item.industryBenchmark}</span>
-                      <span className="text-caption font-medium text-grass-700">{item.reachImpact} estimated reach</span>
-                    </div>
-                    {!decision && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setUnblockDecisions(prev => new Map(prev).set(item.id, "unblock"))}
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-grass-500 text-white text-body3 font-medium hover:bg-grass-600 transition-colors"
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                          Unblock
-                        </button>
-                        <button
-                          onClick={() => setUnblockDecisions(prev => new Map(prev).set(item.id, "keep"))}
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-200 bg-white text-cool-700 text-body3 font-medium hover:bg-neutral-50 transition-colors"
-                        >
-                          Keep Blocked
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => {
-                setUnblockResolved(true);
-                const unblocked = [...unblockDecisions.values()].filter(v => v === "unblock").length;
-                const msg: Message = { id: `resolve-unblock-${Date.now()}`, role: "user", content: `${unblocked} topics unblocked. Continue.` };
-                const veraMsg: Message = { id: `vera-dsp-${Date.now()}`, role: "vera", content: "Great choices! Now let's connect your DSP so the profile can start optimizing campaign performance." };
-                setMessages(prev => [...prev, msg, veraMsg]);
-                setSetupPhase("dsp-connect");
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-plum-600 text-white text-body3 font-medium hover:bg-plum-700 transition-colors"
-            >
-              Continue
-            </button>
           </div>
         )}
 
@@ -2284,16 +2281,14 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                   <span className="text-body3 font-medium text-grass-700">Approved</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-body3 text-cool-600">KPIs</span>
-                  <span className="text-body3 font-medium text-grass-700">Validated</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-body3 text-cool-600">Inconsistencies</span>
-                  <span className="text-body3 font-medium text-grass-700">Resolved ({acceptedInconsistencies.size} accepted)</span>
+                  <span className="text-body3 text-cool-600">Profile Improvements</span>
+                  <span className="text-body3 font-medium text-grass-700">Applied ({acceptedInconsistencies.size} accepted)</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-body3 text-cool-600">Topics Unblocked</span>
-                  <span className="text-body3 font-medium text-cool-900">{[...unblockDecisions.values()].filter(v => v === "unblock").length} via benchmarks</span>
+                  <span className="text-body3 font-medium text-cool-900">
+                    {unblockDecisions.get(10) === "unblock" ? "Political Content unblocked" : "None"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-body3 text-cool-600">DSP</span>
@@ -2347,7 +2342,19 @@ export function VeraPanel({ open, onClose, context = "general" }: VeraPanelProps
                     <Globe className="h-5 w-5 text-plum-600" />
                     <span className="text-body2 font-semibold text-cool-900">Connect Your DSP</span>
                   </div>
-                  <p className="text-body3 text-cool-500 mt-1">Link your demand-side platform to activate brand safety controls on your campaigns.</p>
+                  <ul className="mt-2 space-y-1.5">
+                    {[
+                      "Reduce operational load — we handle the syncing so you don't have to",
+                      "Prevent mistakes — automated brand safety controls eliminate manual errors",
+                      "Connect campaigns automatically across your DSP platforms",
+                      "Unlock financial analysis and optimization insights based on your campaign data",
+                    ].map((benefit, i) => (
+                      <li key={i} className="flex items-start gap-2 text-body3 text-cool-600">
+                        <Check className="h-3.5 w-3.5 text-grass-500 flex-shrink-0 mt-0.5" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="p-4 space-y-3">
                   <div>

@@ -43,11 +43,11 @@ export function BrandSafetyTab({ campaign }: BrandSafetyTabProps) {
         </CardContent>
       </Card>
 
-      {/* Category Breakdown */}
-      <CategoryBreakdown />
-
       {/* Top Blocked Content */}
       <TopBlockedContent />
+
+      {/* Category Breakdown */}
+      <CategoryBreakdown />
 
       {/* Keyword Analysis */}
       <KeywordAnalysis />

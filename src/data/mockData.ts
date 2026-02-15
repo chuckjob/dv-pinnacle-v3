@@ -174,46 +174,67 @@ export const brandSafetyCategories = [
   { name: "Gambling", risk: "low" as const, impressions: 1560, percentage: 4 },
 ];
 
-export const blockedContentItems = [
+export interface BlockedContentItem {
+  id: string;
+  title: string;
+  source: string;
+  url: string;
+  thumbnail: string;
+  categories: string[];
+  risk: "high" | "medium" | "low";
+  impressions: number;
+  mediaWaste: number;
+  blockReason: string;
+}
+
+export const blockedContentItems: BlockedContentItem[] = [
   {
     id: "1",
     title: "Iran Water Crisis: Lake Urmia Dries Up Amid Record Drought",
     source: "reuters.com",
+    url: "https://reuters.com/world/middle-east/iran-water-shortage-lake-urmia-drought-2026",
     thumbnail: "https://images.unsplash.com/photo-1504297050568-910d24c426d3?w=400&h=256&fit=crop",
     categories: ["Violence", "Death & Injury"],
     risk: "high" as const,
     impressions: 45200,
     mediaWaste: 3240,
+    blockReason: "This article was classified under Death & Injury (Medium Risk) because it discusses large-scale humanitarian displacement, waterborne disease outbreaks, and threats to food security. The content references harm to vulnerable populations including children affected by dehydration.",
   },
   {
     id: "2",
     title: "Iran Political Unrest: Protests Erupt Across Major Cities",
     source: "bbc.com",
+    url: "https://bbc.com/news/world-middle-east/iran-protests-major-cities-2026",
     thumbnail: "https://images.unsplash.com/photo-1591696205602-2f950c417cb9?w=400&h=256&fit=crop",
     categories: ["Dangerous Acts", "Political Content"],
     risk: "high" as const,
     impressions: 38900,
     mediaWaste: 2890,
+    blockReason: "This article was flagged under Dangerous Acts due to coverage of civil unrest, crowd confrontations, and reports of protest-related injuries. The political content classification was triggered by references to government opposition movements and regime criticism.",
   },
   {
     id: "3",
     title: "Escalating Tensions: Iran-Israel Conflict Coverage Intensifies",
     source: "aljazeera.com",
+    url: "https://aljazeera.com/news/2026/middle-east/iran-israel-tensions-military",
     thumbnail: "https://images.unsplash.com/photo-1547483238-f400e65ccd56?w=400&h=256&fit=crop",
     categories: ["War & Conflict", "Arms & Ammunition"],
     risk: "medium" as const,
     impressions: 28700,
     mediaWaste: 1560,
+    blockReason: "This article was classified under War & Conflict because it discusses active military tensions between nations, references to weapons systems and defense posturing, and includes analysis of potential armed escalation scenarios in the region.",
   },
   {
     id: "4",
     title: "Graphic Footage: Violent Clashes During Iran Border Standoff",
     source: "cnn.com",
+    url: "https://cnn.com/2026/01/15/world/iran-border-clashes-footage",
     thumbnail: "https://images.unsplash.com/photo-1545893835-abaa50cbe628?w=400&h=256&fit=crop",
     categories: ["Violence", "Graphic Content"],
     risk: "high" as const,
     impressions: 19300,
     mediaWaste: 890,
+    blockReason: "This article was flagged as Graphic Content due to embedded video footage showing physical confrontations, use of crowd control measures, and visible injuries. The Violence classification was triggered by descriptions of forceful clashes and property destruction.",
   },
 ];
 

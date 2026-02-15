@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ShieldOff, MessageSquare, ExternalLink, AlertTriangle } from "lucide-react";
-import { blockedContentItems, formatNumber, formatCurrency } from "@/data/mockData";
+import { ChevronDown, ChevronRight, AlertTriangle, ShieldAlert } from "lucide-react";
+import { blockedContentItems, formatNumber } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 
 const riskBadge = {
@@ -11,6 +11,17 @@ const riskBadge = {
 };
 
 export function TopBlockedContent() {
+  const [expandedReasons, setExpandedReasons] = useState<Set<string>>(new Set());
+
+  const toggleReason = (id: string) => {
+    setExpandedReasons((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   return (
     <Card>
       <CardContent className="p-5">
@@ -19,6 +30,7 @@ export function TopBlockedContent() {
         <div className="grid grid-cols-2 gap-4">
           {blockedContentItems.map((item) => {
             const badge = riskBadge[item.risk];
+            const isExpanded = expandedReasons.has(item.id);
             return (
               <div
                 key={item.id}
@@ -46,11 +58,14 @@ export function TopBlockedContent() {
                 </div>
 
                 <div className="p-4">
-                  <h4 className="text-body3 font-medium text-cool-900 mb-1 line-clamp-1">{item.title}</h4>
-                  <p className="text-caption text-cool-600 mb-3">{item.source}</p>
+                  {/* URL */}
+                  <p className="text-caption text-cool-500 truncate mb-1" title={item.url}>{item.url}</p>
+
+                  {/* Title */}
+                  <h4 className="text-body3 font-medium text-cool-900 mb-2 line-clamp-2">{item.title}</h4>
 
                   {/* Categories */}
-                  <div className="flex flex-wrap gap-1.5 mb-3">
+                  <div className="flex flex-wrap gap-1.5 mb-2">
                     {item.categories.map((cat) => (
                       <span key={cat} className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] leading-[16px] font-medium border", badge.bg, badge.text, badge.border)}>
                         {cat}
@@ -58,26 +73,26 @@ export function TopBlockedContent() {
                     ))}
                   </div>
 
-                  {/* Metrics */}
-                  <div className="flex items-center gap-4 text-caption text-cool-600 mb-3">
-                    <span>{formatNumber(item.impressions)} impressions</span>
-                    <span>{formatCurrency(item.mediaWaste)} waste</span>
+                  {/* Blocked impressions */}
+                  <div className="flex items-center gap-1.5 text-body3 text-cool-600 mb-3">
+                    <ShieldAlert className="h-3.5 w-3.5 text-cool-400" />
+                    <span className="font-medium">{formatNumber(item.impressions)}</span>
+                    <span>blocked impressions</span>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="h-7 text-caption gap-1">
-                      <ShieldOff className="h-3 w-3" />
-                      Blocklist
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-7 text-caption gap-1">
-                      <MessageSquare className="h-3 w-3" />
-                      Feedback
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-7 text-caption gap-1 ml-auto">
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  {/* Expandable reasoning */}
+                  <button
+                    onClick={() => toggleReason(item.id)}
+                    className="flex items-center gap-1 text-body3 font-medium text-plum-600 hover:text-plum-700 transition-colors"
+                  >
+                    {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                    Why was this blocked?
+                  </button>
+                  {isExpanded && (
+                    <div className="mt-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
+                      <p className="text-body3 text-cool-700 leading-relaxed">{item.blockReason}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             );

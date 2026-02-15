@@ -38,7 +38,7 @@ const recommendations = [
     impact: "Medium",
     savings: "-",
     type: "review",
-    status: "completed" as const,
+    status: "applied" as const,
   },
 ];
 
@@ -71,7 +71,7 @@ export function AiOptimizationTab() {
                 key={rec.id}
                 className={cn(
                   "p-4 rounded-lg border transition-colors duration-200",
-                  rec.status === "completed"
+                  rec.status === "applied"
                     ? "border-neutral-100 bg-neutral-25 opacity-70"
                     : "border-neutral-200 hover:border-plum-200 hover:bg-plum-25"
                 )}
@@ -79,7 +79,7 @@ export function AiOptimizationTab() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      {rec.status === "completed" ? (
+                      {rec.status === "applied" ? (
                         <CheckCircle className="h-4 w-4 text-grass-500 flex-shrink-0" />
                       ) : (
                         <Lightbulb className="h-4 w-4 text-plum-500 flex-shrink-0" />
