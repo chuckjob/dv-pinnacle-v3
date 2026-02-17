@@ -24,9 +24,9 @@ const VeraContext = createContext<VeraContextValue | null>(null);
 export function VeraProvider({ children }: { children: ReactNode }) {
   const [veraOpen, setVeraOpen] = useState(false);
   const [veraContext, setVeraContext] = useState<VeraPanelContext>('general');
-  const [goalCreated, setGoalCreated] = useState(true);
+  const [goalCreated, setGoalCreated] = useState(false);
   const [goalConnectedDspLabel, setGoalConnectedDspLabel] = useState('');
-  const [refreshedGoalIds, setRefreshedGoalIds] = useState<Set<string>>(new Set(['goal-5']));
+  const [refreshedGoalIds, setRefreshedGoalIds] = useState<Set<string>>(new Set());
   const [appliedRecIds, setAppliedRecIds] = useState<Set<number>>(new Set());
 
   const addRefreshedGoalId = useCallback((id: string) => {

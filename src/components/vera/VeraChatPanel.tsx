@@ -1523,12 +1523,15 @@ export function VeraChatPanel({ open, onClose, context = 'general' }: VeraChatPa
 
                   <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-plum-50 bg-plum-25">
                     <span className="text-body3 text-grass-600 font-medium">Expected: +10–15 pts viewability</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); navigate('/marketplace'); }}
+                    <a
+                      href="/dv-pinnacle-v3/marketplace?insight=pillar-viewable&products=viewability,scibids-ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="text-body3 font-medium text-plum-600 hover:text-plum-700 transition-colors"
                     >
                       Learn More →
-                    </button>
+                    </a>
                   </div>
                 </div>
               );
@@ -1604,12 +1607,15 @@ export function VeraChatPanel({ open, onClose, context = 'general' }: VeraChatPa
 
                   <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-plum-50 bg-plum-25">
                     <span className="text-body3 text-grass-600 font-medium">Expected: +3 pts suitability</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); navigate('/marketplace'); }}
+                    <a
+                      href="/dv-pinnacle-v3/marketplace?insight=pillar-suitability&products=brand-suitability"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="text-body3 font-medium text-plum-600 hover:text-plum-700 transition-colors"
                     >
                       Learn More →
-                    </button>
+                    </a>
                   </div>
                 </div>
               );
